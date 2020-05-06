@@ -1,6 +1,7 @@
 import UIKit
 
 class SignUpVC: UIViewController {
+ 
     @IBOutlet weak var addPicImageView: UIImageView!
     @IBOutlet weak var fullNameTextField: UITextField!
     @IBOutlet weak var emailTextField: UITextField!
@@ -12,14 +13,14 @@ class SignUpVC: UIViewController {
     var address: String!
     let database = DatabaseManager.shared()
     let imagePicker = UIImagePickerController()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
         
     }
     
     private func isValidData() -> Bool {
-        if let name = fullNameTextField.text, !name.isEmpty, let email = emailTextField.text, !email.isEmpty, let password = passwordTextField.text, !password.isEmpty, let contact = contactNumberTextField.text, !contact.isEmpty, let image = addPicImageView.image, image != UIImage(named: "CreateAcc") {
+        if let name = fullNameTextField.text, !name.isEmpty, let email = emailTextField.text, !email.isEmpty, let address = locationLabel.text, !address.isEmpty, let password = passwordTextField.text, !password.isEmpty, let contact = contactNumberTextField.text, !contact.isEmpty, let image = addPicImageView.image, image != UIImage(named: "CreateAcc") {
             if email.isValidEmail, password.isValidPassword, contact.isPhoneNumber, database.emailNotExists(email: email) {
                 return true
             } else {
@@ -47,6 +48,9 @@ class SignUpVC: UIViewController {
     }
     
     
+    
+    
+    
     func gotToSignIn() {
         let signInVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SignInVC") as! SignInVC
         navigationController?.pushViewController(signInVC, animated: true)
@@ -56,13 +60,14 @@ class SignUpVC: UIViewController {
     func checkUser() {
         database.createUsersTable()
         database.createCachDataTable()
-        let user = User(name: fullNameTextField.text ?? "", email: emailTextField.text ?? "", password: passwordTextField.text ?? "", contactNum: contactNumberTextField.text ?? "", img: addPicImageView.image?.pngData())
+        let user = User(name: fullNameTextField.text ?? "", email: emailTextField.text ?? "", password: passwordTextField.text ?? "", contactNum: contactNumberTextField.text ?? "", img: addPicImageView.image?.pngData(), address: address)
        database.insertUsers(user: user)
        database.insertCacheData()
     }
     
     @IBAction func pickLocation(_ sender: UIButton) {
         let pickLocation = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "MapVC") as! MapVC
+        pickLocation.delegate = self
         navigationController?.pushViewController(pickLocation, animated: true)
         
     }
@@ -78,6 +83,8 @@ class SignUpVC: UIViewController {
         }
         
     }
+    
+   
 }
 
 extension SignUpVC: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
@@ -103,10 +110,10 @@ extension SignUpVC {
     }
 }
 
-extension SignUpVC: SendingMessageDelegate{
+
+extension SignUpVC: SendingMessageDelegate {
     func messageData(data: String) {
-        self.locationLabel.text = "Your location is \(data)"
-        self.address = data
-        print("LocationHere")
+            locationLabel.text = "Your location is \(data)"
+            self.address = data
     }
 }

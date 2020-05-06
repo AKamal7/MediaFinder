@@ -9,6 +9,7 @@ class DatabaseManager {
     private let email = Expression<String>("email")
     private let password = Expression<String>("password")
     private let contactNum = Expression<String>("contactNum")
+    private let address = Expression<String>("address")
     private let name = Expression<String>("name")
     private let photo = Expression<Data>("photo")
     let cachedData = Table("chachedData")
@@ -39,6 +40,7 @@ class DatabaseManager {
                     t.column(self.id, primaryKey: .autoincrement)
                     t.column(self.name)
                     t.column(self.password)
+                    t.column(self.address)
                     t.column(self.contactNum)
                     t.column(self.email, unique: true)
                     t.column(self.photo)
@@ -51,6 +53,13 @@ class DatabaseManager {
         } else {
             print("Table Already Exists")
         }
+    }
+    
+    func isTableExists(table: Table) -> Bool {
+        if (try? db?.scalar(table.exists)) != nil {
+            return true
+        }
+        return false
     }
     
     func createCachDataTable() {
@@ -70,12 +79,6 @@ class DatabaseManager {
         }
     }
     
-    func isTableExists(table: Table) -> Bool {
-        if (try? db?.scalar(table.exists)) != nil {
-            return true
-        }
-        return false
-    }
     
     func updateCacheData(text: String) {
         let id = UserDefaults.standard.integer(forKey: "id")
@@ -155,7 +158,7 @@ class DatabaseManager {
             for user in userData {
                 if id == user[self.id] {
                     
-                    return User(name: user[self.name], email: user[self.email], password: user[self.password], contactNum: user[self.contactNum], img: user[self.photo])
+                    return User(name: user[self.name], email: user[self.email], password: user[self.password], contactNum: user[self.contactNum], img: user[self.photo], address: user[self.address])
                 }
                 
             }
@@ -167,7 +170,7 @@ class DatabaseManager {
     
     func insertUsers(user: User) {
         do {
-            let insert = userData.insert(self.name <- user.name, self.email <- user.email, self.password <- user.password, self.contactNum <- user.contactNum, self.photo <- user.img)
+            let insert = userData.insert(self.name <- user.name, self.email <- user.email, self.password <- user.password, self.contactNum <- user.contactNum, self.photo <- user.img, self.address <- user.address)
             try db!.run(insert)
             
         } catch {

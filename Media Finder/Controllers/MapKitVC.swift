@@ -93,5 +93,6 @@ class MapVC: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
     @IBAction func doneBtnPressed(_ sender: UIButton) {
         delegate?.messageData(data: locationLabel.text!)
         self.navigationController?.popViewController(animated: true)
+         print(locationLabel.text ?? "")
     }
 }

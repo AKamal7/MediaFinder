@@ -9,7 +9,7 @@ struct User {
     var password: String!
     var contactNum: String!
     var img: Data!
-    
+    var address: String!
   
     
 }
